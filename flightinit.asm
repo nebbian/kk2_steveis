@@ -208,7 +208,8 @@ fli8:	b16store_array FilteredOut1, Temp
 	ldz eeSelflevelPgain			;copy and scale Profile1 Self Level P gain & limit from EE to 16.8 variables
 	call fli2
 ;	call fli3
-	b16mov SelflevelPgain, Temp		
+	b16mov SelflevelPgain, Temp
+	b16mov SelfLevelPgainOrg, Temp
 						;set flag if SLPgain is zero
 	rvsetflagfalse flagSLPGZero		;assume false
 	b16clr	Temp
@@ -315,7 +316,35 @@ fli15:
 	ldz eeAutoDisarm
 	call ReadEeprom
 	sts flagAutoDisarm, t
-	
+
+		ldz eeSlPgainRate			;SL Stick Mixing
+    	call ReadEeprom
+    	push t					;save the t register since it is used by setFlagTrue and setFlagFalse also
+    	tst t					;is SL P-gain rate zero?
+    	breq fli30
+    	setFlagtrue t				;no, turn on SL Stick Mixing
+    	rjmp fli31
+
+    fli30:	setFlagFalse t				;yes, turn off SL Stick Mixing (but we'll still set MEDIUM SL P-gain rate)
+    fli31:	sts flagSlStickMixing, t
+    	pop t
+    	cpi t, 0x04				;low?
+    	breq fli32
+    	cpi t, 0x01				;high?
+    	breq fli33
+    	b16ldi SelflevelPgainRate, 0.1		;neither, setting SL P-gain rate to MEDIUM
+    	ldi t, 'M'
+    	rjmp fli34
+
+    fli32:	b16ldi SelflevelPgainRate, 0.05		;setting SL P-gain rate to LOW
+    	ldi t, 'L'
+    	rjmp fli34
+
+    fli33:	b16ldi SelflevelPgainRate, 0.2		;setting SL P-gain rate to HIGH
+    	ldi t, 'H'
+
+    fli34:	sts SlStickMixingChar, t		;character (M/L/H) to be displayed on the SAFE screen
+
 	lrv OutputRateDividerCounter, 1
 	lrv OutputRateDivider, 5		;slow rate divider. f = 400 / OutputRateDivider
 

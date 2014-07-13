@@ -189,6 +189,10 @@ eei8:	movw z, y
 	call StoreEeVariable8
 
 	clr xl
+	ldz eeSlPgainRate
+	call StoreEeVariable8
+
+	clr xl
 	ldz eeRxType
 	call StoreEeVariable8
 

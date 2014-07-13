@@ -144,6 +144,8 @@ FixedPointVariableEnumerate168 Offset8
 FixedPointVariableEnumerate168 Temper
 
 FixedPointVariableEnumerate168 SelflevelPgain
+FixedPointVariableEnumerate168 SelflevelPgainOrg
+FixedPointVariableEnumerate168 SelflevelPgainRate
 FixedPointVariableEnumerate168 SelflevelPlimit
 FixedPointVariableEnumerate168 SelflevelPgainP2
 FixedPointVariableEnumerate168 SelflevelPlimitP2
@@ -385,6 +387,8 @@ RamVariableEnumerate8 StatusOldState
 
 RamVariableEnumerate8 flagAutoDisarm
 RamVariableEnumerate8 flagLMA
+RamVariableEnumerate8 flagSlStickMixing
+RamVariableEnumerate8 SlStickMixingChar
 
 RamVariableEnumerate8 flagMutePwm
 
@@ -522,6 +526,8 @@ EEVariableEnumerate8 eeAutoDisarm		;true=on  false=off
 EEVariableEnumerate8 eeRxType			;0 = Std, 1 = CPPM, 2 = Sat, 3 = SBus
 EEVariableEnumerate8 eeChannelMap		;true=on  false=off
 EEVariableEnumerate8 eeflagLMA			;true=on  false=off
+
+EEVariableEnumerate8 eeSlPgainRate		;4=low, 2=medium, 1=high, 0=off (SL Stick Mixing)
 
 EEVariableEnumerate16 eeCamRollGain		;do not change the order of these variables, works as an array
 EEVariableEnumerate16 eeCamRollOffset

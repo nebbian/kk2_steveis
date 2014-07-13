@@ -1,5 +1,39 @@
+Imu:	;--- SL Stick Mixing ---
 
-Imu:	;--- Get Sensor Data ---
+	rvbrflagtrue flagSelfLevelOn, im49		;skip this section if SL is off
+	rjmp im55
+
+im49:	rvbrflagtrue flagSlStickMixing, im50		;skip this section if SL Stick Mixing is off
+	rjmp im55
+
+im50:	b16clr Temp					;is the roll stick value positive?
+	b16mov Temper, RxRoll
+	b16cmp Temper, Temp
+	brge im51
+
+	b16neg Temper					;no, make it positive
+im51:	b16cmp RxPitch, Temp				;is the pitch stick value positive?
+	brlt im52
+
+	b16mov Temp, RxPitch				;yes
+	rjmp im53
+
+im52:	b16mov Temp, RxPitch				;no, make it positive
+	b16neg Temp
+
+im53:	b16cmp Temper, Temp				;compare the absolute roll and pitch values
+	brge im54
+
+	b16mov Temper, Temp				;SL P gain will be reduced based on the highest value
+im54:	b16mul Temp, Temper, SelflevelPgainRate
+	b16sub SelfLevelPgain, SelfLevelPgainOrg, Temp
+	brge im55
+
+	b16clr SelfLevelPgain				;cannot use negative gain values
+im55:
+
+
+	;--- Get Sensor Data ---
 
 	call AdcRead					;Calculate gyro output
 	b16sub GyroRoll, GyroRoll, GyroRollZero
@@ -240,9 +274,16 @@ im31a:
 	rvbrflagfalse flagSLPGZero,im31		;execute SL code if SL P Gain is > zero
 	rjmp im30				;skip SL code if SL P Gain is zero
 
-im31:	
 
-;--- Roll Axis Self-level P ---
+im31:	;--- SL Stick Mixing, Pt. 2 ---
+
+	rvbrflagfalse flagSlStickMixing, im60
+	b16mov CommandRoll, RxRoll		;save pitch and roll input for use in SL Stick Mixing Pt. 3
+	b16mov CommandPitch, RxPitch
+
+
+im60:	;--- Roll Axis Self-level P ---
+
 
 	b16neg RxRoll
 	
@@ -276,9 +317,15 @@ im31:
 	b16mov RxPitch, Value
 
 	b16fdiv RxPitch, 1
-im30:
 
-;--- Roll Axis PI ---
+	;--- SL Stick Mixing, Pt. 3 ---
+
+	rvbrflagfalse flagSlStickMixing, im30
+	b16add RxRoll, RxRoll, CommandRoll	;final SL stick mixing
+	b16add RxPitch, RxPitch, CommandPitch
+
+
+im30:	;--- Roll Axis PI ---
 	
 	b16sub Error, GyroRoll, RxRoll		;calculate error
 	b16fdiv Error, 1

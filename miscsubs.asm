@@ -46,11 +46,14 @@ get1:	pop yl		;no, exit
 	pop xl
 	ret
 
-
-GetButtonsBlocking:
-med34:	call GetButtons		;wait until button released
+ReleaseButtons:
+med34:	rcall GetButtons	;wait until button released
 	cpi t, 0x00
 	brne med34
+	ret
+
+GetButtonsBlocking:
+	rcall ReleaseButtons
 
 med9:	call GetButtons		;wait until button pressed
 	cpi t, 0x00

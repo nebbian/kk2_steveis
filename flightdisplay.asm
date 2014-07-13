@@ -94,22 +94,21 @@ udp23c:
 	;--- print Selflevel status ---
 
 	lrv X1, 0
-	lrv Y1, 18
+	lrv Y1, 17
 	lrv FontSelector, f6x8
-	mPrintString udp9	;"Self-level is "
+	mPrintString udp9
 
-	rvflagnot flagA, flagSelfLevelOn
-	rvflagor  flagB, flagA, flagSLPGZero
-	rvflagand flagC, flagSLPGP2Zero, flagSwitchSSPI
-	rvflagor  flagA, flagB, flagC
-	rvbrflagtrue flagA, udp12
-
-	mPrintString udp10	;"On"
+	rvbrflagfalse flagSelfLevelOn, udp50
+	mPrintString udp10
+	rvbrflagfalse flagSlStickMixing, udp13
+	mPrintString udp12
+	lds t, SlStickMixingChar
+	call PrintChar
 	rjmp udp13
-udp12:	mPrintString udp11	;"Off"
-udp13:	
 
-	;--- Print status ----
+udp50:	mPrintString udp11
+
+udp13:	;--- Print status ----
 
 	lrv X1, 0
 	lrv Y1, 27
@@ -275,9 +274,10 @@ upd2:	.db 66,58,61,60, 0, 0		;the text "SAFE" in the mangled 12x16 font
 upd4:   .db 60,65,65,64,65, 0		;the text "ERROR" in the mangled 12x16 font
 upd5:	.db 58,65,62,60,59, 0		;the text "ARMED" in the mangled 12x16 font
 
-udp9:	.db "Self-level is ",0,0
-udp10:	.db "ON",0,0
-udp11:	.db "OFF",0
+udp9:	.db "Self-level : ", 0
+udp10:	.db "ON ", 0
+udp11:	.db "OFF", 0
+udp12:	.db "MIX ", 0, 0
 
 udp30:	.db "Batt:",0
 udp32:	.db "Temp:",0
